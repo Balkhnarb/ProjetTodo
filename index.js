@@ -10,29 +10,32 @@ const connection = mysql.createConnection({
   database: 'lpdip'
 });
 
-app.get('/users',function(req,res){
-  connection.query('SELECT * FROM user',function(err,result,fields){
+app.get('/todos',function(req,res){
+  connection.query('SELECT * FROM todo',function(err,result,fields){
     res.json(result)
   })
 })
 
-app.get('/user/:id',function(req,res){
-  if(isNaN(req.params.id)){
-    let reqsql = 'SELECT * FROM user WHERE id='+req.params.id
-    connection.query(reqsql,function(err,result,fields){
-      res.json(result)
-    })
-  }
+app.post('/todos',function(req,res){
+  connection.query("INSERT INTO todo (label,isDone) VALUES ('?',?)",[req.body.label,req.body.isDone],function(err,result,fields){
+    res.json(result)
+  })
+})
+
+app.put('/todos/:id',function(req,res){
+  connection.query("UPDATE todo SET label='?',isDone=? WHERE id = ?",[req.body.label,req.body.isDone,req.params.id],function(err,result,fields){
+    res.json(result)
+  })
+})
+
+app.delete('/todos/:id',function(req,res){
+  connection.query('DELETE FROM todo WHERE id = ?',[req.params.id],function(err,result,fields){
+    res.json(result)
+  })
 })
 
 app.get('/', function (req, res) {
-  
-  let obj = {
-    "Nom" : "Jean",
-    "Age" : 34
-  }
-
-  res.json(obj);
+  res.send('hello, go on route /todos for the list')
 })
 
 app.listen(3000, function () {
